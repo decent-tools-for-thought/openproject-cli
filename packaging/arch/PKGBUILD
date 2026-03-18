@@ -1,13 +1,13 @@
 pkgname=openproject-cli
 pkgver=0.1.0
-pkgrel=2
+pkgrel=1
 pkgdesc='Command-line client for OpenProject API v3'
 arch=('any')
 url='https://github.com/decent-tools-for-thought/openproject-cli'
 license=('unknown')
 depends=('python')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/decent-tools-for-thought/openproject-cli/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('61bf53caf23693c7621e3d54e760fddfb408bc24fb29d94eb0f23e098d48a8a9')
+sha256sums=('80ba7b7d9280dbcf837175bfcf8fb750e3a4f140d85a70d51c8a45e5dbeff80a')
 
 package() {
   local extracted_dir
