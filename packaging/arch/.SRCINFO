@@ -1,0 +1,12 @@
+pkgbase = openproject-cli
+	pkgdesc = Command-line client for OpenProject API v3
+	pkgver = 0.1.0
+	pkgrel = 2
+	url = https://github.com/decent-tools-for-thought/openproject-cli
+	arch = any
+	license = unknown
+	depends = python
+	source = openproject-cli-0.1.0.tar.gz::https://github.com/decent-tools-for-thought/openproject-cli/releases/download/v0.1.0/openproject-cli-0.1.0.tar.gz
+	sha256sums = 61bf53caf23693c7621e3d54e760fddfb408bc24fb29d94eb0f23e098d48a8a9
+
+pkgname = openproject-cli
