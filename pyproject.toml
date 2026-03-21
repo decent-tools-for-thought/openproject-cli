@@ -7,6 +7,7 @@ name = "openproject-cli"
 version = "0.1.0"
 description = "Small command-line client for OpenProject API v3"
 readme = "README.md"
+license = "0BSD"
 requires-python = ">=3.11"
 
 [dependency-groups]
