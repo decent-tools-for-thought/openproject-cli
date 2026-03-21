@@ -18,77 +18,84 @@ Small command-line client for OpenProject API v3.
 
 ## Quick start
 
+Set up the repo with `uv`:
+
+```bash
+uv sync
+uv run openproject --help
+```
+
 Save credentials once, then run commands without passing token/url each time:
 
 ```bash
-./openproject_cli.py login --base-url "https://openproject.example.org" --username "apikey" --token-file /path/to/token.txt
-./openproject_cli.py me
+uv run openproject login --base-url "https://openproject.example.org" --username "apikey" --token-file /path/to/token.txt
+uv run openproject me
 ```
 
 List projects:
 
 ```bash
-./openproject_cli.py projects list --page-size 10
+uv run openproject projects list --page-size 10
 ```
 
 Get one project:
 
 ```bash
-./openproject_cli.py projects get 1
+uv run openproject projects get 1
 ```
 
 List work packages (all):
 
 ```bash
-./openproject_cli.py work-packages list --page-size 10
+uv run openproject work-packages list --page-size 10
 ```
 
 List work packages for one project:
 
 ```bash
-./openproject_cli.py work-packages list --project-id 1 --page-size 10
+uv run openproject work-packages list --project-id 1 --page-size 10
 ```
 
 Create a work package (requires explicit write permission):
 
 ```bash
-./openproject_cli.py work-packages create 1 --subject "Example task" --description "Created via CLI" --allow-write
+uv run openproject work-packages create 1 --subject "Example task" --description "Created via CLI" --allow-write
 ```
 
 Update a work package (lock version is auto-fetched if omitted):
 
 ```bash
-./openproject_cli.py work-packages update 123 --subject "Renamed task" --allow-write
+uv run openproject work-packages update 123 --subject "Renamed task" --allow-write
 ```
 
 Delete a work package (extra safeguard):
 
 ```bash
-./openproject_cli.py work-packages delete 123 --allow-write
+uv run openproject work-packages delete 123 --allow-write
 ```
 
 Non-interactive delete requires an explicit confirmation token:
 
 ```bash
-./openproject_cli.py work-packages delete 123 --allow-write --yes --confirm-delete delete-123
+uv run openproject work-packages delete 123 --allow-write --yes --confirm-delete delete-123
 ```
 
 Generic request (read-only):
 
 ```bash
-./openproject_cli.py request /projects --query pageSize=5
+uv run openproject request /projects --query pageSize=5
 ```
 
 Generic write request (explicitly allowed + confirmed):
 
 ```bash
-./openproject_cli.py request /work_packages --method POST --allow-write --body '{"subject":"Example"}'
+uv run openproject request /work_packages --method POST --allow-write --body '{"subject":"Example"}'
 ```
 
 To skip prompt for automation:
 
 ```bash
-./openproject_cli.py request /work_packages --method POST --allow-write --yes --body '{"subject":"Example"}'
+uv run openproject request /work_packages --method POST --allow-write --yes --body '{"subject":"Example"}'
 ```
 
 ## Configuration
@@ -104,6 +111,8 @@ Credential resolution priority:
 2. Environment variables (`OP_API_TOKEN`, `OP_BASE_URL`, `OP_USERNAME`, `OP_AUTH_MODE`)
 3. Saved login config (`openproject_cli.py login`)
 
+You can still run `./openproject_cli.py ...` directly, but `uv run openproject ...` is the default workflow now.
+
 There is no built-in default URL.
 
 Default saved config path:
@@ -117,41 +126,9 @@ Default saved config path:
 - Write commands never run unless `--allow-write` is provided.
 - Delete commands require additional confirmation (`delete-<id>`).
 
-## Arch package
+## Releases
 
-Arch packaging metadata is in `packaging/arch/` and is designed to install from a GitHub release tarball asset named:
+Tagging `v<version>` publishes a source archive built from the tagged commit:
 
 - `openproject-cli-<version>.tar.gz`
-
-Current packaging files:
-
-- `packaging/arch/PKGBUILD`
-- `packaging/arch/.SRCINFO`
-
-### Release flow for Arch tarball source
-
-1. Ensure `main` is up to date and your working tree is clean.
-2. Run:
-
-```bash
-./scripts/release.sh 0.1.0
-```
-
-What this does:
-
-- Creates and pushes git tag `v0.1.0`
-- Creates GitHub release `v0.1.0`
-- Downloads GitHub generated source tarball
-- Renames and uploads it as release asset `openproject-cli-0.1.0.tar.gz`
-- Computes SHA256 of that asset
-- Updates `packaging/arch/PKGBUILD` (`pkgver`, `sha256sums`)
-- Regenerates `packaging/arch/.SRCINFO`
-- Creates a local commit for Arch metadata update
-
-### Build check
-
-```bash
-cd packaging/arch
-makepkg --printsrcinfo > .SRCINFO
-makepkg -f
-```
+- `SHA256SUMS`

@@ -3,8 +3,6 @@
 !.env.example
 __pycache__/
 *.py[cod]
-packaging/arch/pkg/
-packaging/arch/src/
-packaging/arch/*.pkg.tar.zst
-packaging/arch/*.tar.gz
+dist/
 /token.env
+.venv/

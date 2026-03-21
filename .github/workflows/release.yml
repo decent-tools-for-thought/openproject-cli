@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Smoke test CLI help
+        run: python openproject_cli.py --help >/dev/null
+
+      - name: Build tagged source archive
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          git archive \
+            --format=tar.gz \
+            --prefix="openproject-cli-${version}/" \
+            "${GITHUB_REF_NAME}" \
+            -o "dist/openproject-cli-${version}.tar.gz"
+          (
+            cd dist
+            sha256sum "openproject-cli-${version}.tar.gz" > SHA256SUMS
+          )
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/openproject-cli-*.tar.gz
+            dist/SHA256SUMS
