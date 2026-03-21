@@ -485,7 +485,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="openproject-cli",
         description="OpenProject API v3 CLI (safe by default).",
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command")
 
     me = subparsers.add_parser("me", help="Show current user")
     add_common_auth_args(me)
@@ -503,7 +503,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     projects = subparsers.add_parser("projects", help="Project operations")
     add_common_auth_args(projects)
-    projects_sub = projects.add_subparsers(dest="subcommand", required=True)
+    projects_sub = projects.add_subparsers(dest="subcommand")
 
     p_list = projects_sub.add_parser("list", help="List projects")
     p_list.add_argument("--page-size", type=int, default=20)
@@ -522,7 +522,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     wp = subparsers.add_parser("work-packages", help="Work package operations")
     add_common_auth_args(wp)
-    wp_sub = wp.add_subparsers(dest="subcommand", required=True)
+    wp_sub = wp.add_subparsers(dest="subcommand")
 
     wp_list = wp_sub.add_parser("list", help="List work packages")
     wp_list.add_argument("--page-size", type=int, default=20)
@@ -591,6 +591,16 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+    if args.command is None:
+        parser.print_help()
+        return 0
+    if args.command in {"projects", "work-packages"} and args.subcommand is None:
+        next(
+            action
+            for action in parser._actions
+            if isinstance(action, argparse._SubParsersAction)
+        ).choices[args.command].print_help()
+        return 0
     return args.func(args)
 
 
