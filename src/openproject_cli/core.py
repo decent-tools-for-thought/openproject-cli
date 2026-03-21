@@ -23,12 +23,17 @@ from typing import Any
 
 
 READ_ONLY_METHODS = {"GET", "HEAD", "OPTIONS"}
-DEFAULT_CONFIG_PATH = Path.home() / ".config" / "openproject-cli" / "config.json"
+
+
+def default_config_path() -> Path:
+    config_home = os.getenv("XDG_CONFIG_HOME")
+    base_dir = Path(config_home).expanduser() if config_home else Path.home() / ".config"
+    return base_dir / "openproject-cli" / "config.json"
 
 
 def config_path() -> Path:
     raw = os.getenv("OPENPROJECT_CLI_CONFIG")
-    return Path(raw).expanduser() if raw else DEFAULT_CONFIG_PATH
+    return Path(raw).expanduser() if raw else default_config_path()
 
 
 def load_saved_config() -> dict[str, Any]:
