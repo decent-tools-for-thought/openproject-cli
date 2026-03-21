@@ -10,7 +10,7 @@ Small command-line client for OpenProject API v3.
   - `--token`
   - `OP_API_TOKEN` environment variable
   - `--token-file`
-  - saved login config (`openproject_cli.py login`)
+  - saved login config (`openproject login`)
 - Auth mode:
   - `auto` (default): uses Bearer if token starts with `opapi-`, otherwise Basic with username `apikey`.
   - `bearer`
@@ -109,9 +109,9 @@ Credential resolution priority:
 
 1. Command-line flags (`--token`, `--base-url`, `--username`, `--auth-mode`)
 2. Environment variables (`OP_API_TOKEN`, `OP_BASE_URL`, `OP_USERNAME`, `OP_AUTH_MODE`)
-3. Saved login config (`openproject_cli.py login`)
+3. Saved login config (`openproject login`)
 
-You can still run `./openproject_cli.py ...` directly, but `uv run openproject ...` is the default workflow now.
+For a no-install module invocation, use `python -m openproject_cli ...`.
 
 There is no built-in default URL.
 
@@ -128,7 +128,8 @@ Default saved config path:
 
 ## Releases
 
-Tagging `v<version>` publishes a source archive built from the tagged commit:
+Tagging `v<version>` builds and verifies the packaged distributions, then publishes them:
 
-- `openproject-cli-<version>.tar.gz`
+- `openproject_cli-<version>.tar.gz`
+- `openproject_cli-<version>-py3-none-any.whl`
 - `SHA256SUMS`
