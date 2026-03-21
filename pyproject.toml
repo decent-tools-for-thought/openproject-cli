@@ -13,7 +13,10 @@ requires-python = ">=3.11"
 dev = []
 
 [project.scripts]
-openproject = "openproject_cli:main"
+openproject = "openproject_cli.cli:main"
 
 [tool.setuptools]
-py-modules = ["openproject_cli"]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
