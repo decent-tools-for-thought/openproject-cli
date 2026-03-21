@@ -32,12 +32,15 @@ jobs:
           python -m venv .venv-sdist
           .venv-sdist/bin/python -m pip install --upgrade pip setuptools wheel
           .venv-sdist/bin/python -m pip install --no-build-isolation dist/openproject_cli-*.tar.gz
+          .venv-sdist/bin/python -c "import openproject_cli"
           .venv-sdist/bin/openproject --help >/dev/null
 
       - name: Smoke test install from wheel
         run: |
           python -m venv .venv-wheel
+          .venv-wheel/bin/python -m pip install --upgrade pip
           .venv-wheel/bin/python -m pip install dist/openproject_cli-*.whl
+          .venv-wheel/bin/python -c "import openproject_cli"
           .venv-wheel/bin/openproject --help >/dev/null
 
       - name: Generate checksums
