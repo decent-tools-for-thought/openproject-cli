@@ -16,14 +16,29 @@ Small command-line client for OpenProject API v3.
   - `bearer`
   - `basic`
 
-## Quick start
+## Install
 
-Set up the repo with `uv`:
+Install from PyPI:
+
+```bash
+pip install openproject-cli
+openproject --help
+```
+
+For local development, use `uv`:
 
 ```bash
 uv sync
 uv run openproject --help
 ```
+
+The package also supports module invocation:
+
+```bash
+python -m openproject_cli --help
+```
+
+## Auth and config
 
 Save credentials once, then run commands without passing token/url each time:
 
@@ -111,13 +126,42 @@ Credential resolution priority:
 2. Environment variables (`OP_API_TOKEN`, `OP_BASE_URL`, `OP_USERNAME`, `OP_AUTH_MODE`)
 3. Saved login config (`openproject login`)
 
-For a no-install module invocation, use `python -m openproject_cli ...`.
-
 There is no built-in default URL.
 
 Default saved config path:
 
 - `~/.config/openproject-cli/config.json`
+- `$XDG_CONFIG_HOME/openproject-cli/config.json` when `XDG_CONFIG_HOME` is set
+
+Token resolution priority:
+
+1. `--token`
+2. `OP_API_TOKEN`
+3. `--token-file`
+4. Saved login config
+
+`--token-file` accepts either a raw token or a simple env-style file containing one of:
+
+- `OP_API_TOKEN=...`
+- `OPENPROJECT_API_TOKEN=...`
+- `API_TOKEN=...`
+- `TOKEN=...`
+
+## Smoke usage
+
+Minimal read-only smoke test against a configured instance:
+
+```bash
+openproject me
+```
+
+Minimal write-path smoke test without sending a write:
+
+```bash
+openproject request /work_packages --method POST
+```
+
+That command should refuse the request until `--allow-write` is provided.
 
 ## Notes
 
@@ -126,10 +170,26 @@ Default saved config path:
 - Write commands never run unless `--allow-write` is provided.
 - Delete commands require additional confirmation (`delete-<id>`).
 
+## Quality checks
+
+Local baseline:
+
+```bash
+uv sync --group dev
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy
+uv run pytest
+```
+
+CI runs the same lint, type, and test suite on pushes to `main` and pull requests.
+
 ## Releases
 
-Tagging `v<version>` builds and verifies the packaged distributions, then publishes them:
+Tagging `v<version>` builds and verifies the packaged distributions, then uploads:
 
 - `openproject_cli-<version>.tar.gz`
 - `openproject_cli-<version>-py3-none-any.whl`
 - `SHA256SUMS`
+
+The release workflow installs both the wheel and sdist into fresh virtual environments, verifies `import openproject_cli`, and runs `openproject --help`.

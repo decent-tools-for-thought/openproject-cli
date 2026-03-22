@@ -11,7 +11,11 @@ license = "0BSD"
 requires-python = ">=3.11"
 
 [dependency-groups]
-dev = []
+dev = [
+    "mypy>=1.18.2",
+    "pytest>=8.4.2",
+    "ruff>=0.13.3",
+]
 
 [project.scripts]
 openproject = "openproject_cli.cli:main"
@@ -21,3 +25,20 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src/openproject_cli"]
+strict = true
+warn_unused_configs = true
