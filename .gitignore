@@ -7,3 +7,4 @@ __pycache__/
 dist/
 /token.env
 .venv/
+QUALITY_ROADMAP.md
