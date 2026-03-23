@@ -1,19 +1,25 @@
+<div align="center">
+
 # openproject-cli
 
-[![Release](https://img.shields.io/github/v/release/decent-tools-for-thought/openproject-cli?sort=semver)](https://github.com/decent-tools-for-thought/openproject-cli/releases)
-![Python](https://img.shields.io/badge/python-3.11%2B-blue)
-![License](https://img.shields.io/badge/license-0BSD-green)
+[![Release](https://img.shields.io/github/v/release/decent-tools-for-thought/openproject-cli?sort=semver&color=0f766e)](https://github.com/decent-tools-for-thought/openproject-cli/releases)
+![Python](https://img.shields.io/badge/python-3.11%2B-0ea5e9)
+![License](https://img.shields.io/badge/license-0BSD-14b8a6)
 
-Small command-line client for OpenProject API v3 with explicit write safety.
+Safe-by-default command-line client for OpenProject API v3 with saved login support, read workflows, and explicitly gated writes.
+
+</div>
 
 > [!IMPORTANT]
 > This codebase is entirely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
 
-## Why This Exists
-
-- Browse projects and work packages from the shell.
-- Keep state-changing requests gated behind explicit confirmation.
-- Make automation possible without losing safe defaults.
+## Map
+- [Install](#install)
+- [Functionality](#functionality)
+- [Authentication](#authentication)
+- [Quick Start](#quick-start)
+- [Development](#development)
+- [Credits](#credits)
 
 ## Install
 
@@ -29,42 +35,60 @@ uv sync
 uv run openproject --help
 ```
 
-## Quick Start
+## Functionality
 
-Log in once:
+### Login And Session Setup
+- `openproject login`: save a base URL, token, username, and auth mode for later commands.
+- `openproject login --no-test`: skip the `/users/me` credential test during setup.
+- `openproject login`: supports token input from `--token`, `--token-file`, environment variables, or an interactive prompt.
 
-```bash
-uv run openproject login \
-  --base-url "https://openproject.example.org" \
-  --username "apikey" \
-  --token-file /path/to/token.txt
-```
+### Read-Only API Workflows
+- `openproject me`: fetch the current authenticated user.
+- `openproject projects list`: list projects with page size, offset, and raw OpenProject filter JSON.
+- `openproject projects get <project-id>`: fetch one project.
+- `openproject work-packages list`: list work packages globally or scoped to one project.
+- `openproject work-packages get <work-package-id>`: fetch one work package.
+- Read commands support `--output json|raw` and `--headers` for HTTP metadata.
 
-Read-only workflows:
+### Write Workflows
+- `openproject work-packages create <project-id>`: create a work package with subject, description, type, status, priority, assignee, responsible user, start date, due date, and an additional merged JSON body.
+- `openproject work-packages update <work-package-id>`: update a work package with explicit field flags or a merged JSON body.
+- `openproject work-packages update`: auto-fetch `lockVersion` when omitted and use that for optimistic locking.
+- `openproject work-packages delete <work-package-id>`: delete a work package with explicit confirmation text.
 
-```bash
-uv run openproject me
-uv run openproject projects list --page-size 10
-uv run openproject work-packages list --project-id 1 --page-size 10
-```
-
-Write workflows require opt-in:
-
-```bash
-uv run openproject work-packages create 1 \
-  --subject "Example task" \
-  --allow-write
-```
+### Generic Requests And Safety Controls
+- `openproject request <path>`: send a generic API request to any OpenProject API path.
+- `openproject request`: supports arbitrary HTTP methods, repeatable query parameters, and JSON request bodies.
+- All state-changing requests require `--allow-write`.
+- All state-changing requests can additionally require interactive confirmation unless `--yes` is passed.
+- Deletion with `--yes` still requires an explicit `--confirm-delete delete-<id>` value.
 
 ## Authentication
 
 Resolution priority:
 
 1. Command-line flags
-2. Environment variables such as `OP_API_TOKEN` and `OP_BASE_URL`
+2. Environment variables such as `OP_API_TOKEN`, `OP_BASE_URL`, `OP_USERNAME`, and `OP_AUTH_MODE`
 3. Saved config from `openproject login`
 
 Write methods (`POST`, `PUT`, `PATCH`, `DELETE`) never run unless `--allow-write` is provided.
+
+## Quick Start
+
+```bash
+uv run openproject login \
+  --base-url "https://openproject.example.org" \
+  --username "apikey" \
+  --token-file /path/to/token.txt
+
+uv run openproject me
+uv run openproject projects list --page-size 10
+uv run openproject work-packages list --project-id 1 --page-size 10
+
+uv run openproject work-packages create 1 \
+  --subject "Example task" \
+  --allow-write
+```
 
 ## Development
 
@@ -77,4 +101,6 @@ uv run pytest
 
 ## Credits
 
-This client builds on OpenProject API v3 and is not affiliated with OpenProject. Credit goes to the OpenProject project for the upstream platform and API documentation.
+This client is built for OpenProject API v3 and is not affiliated with OpenProject.
+
+Credit goes to the OpenProject project for the upstream platform, API model, and documentation this tool builds on.
