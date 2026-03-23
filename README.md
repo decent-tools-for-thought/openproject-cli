@@ -14,11 +14,11 @@ Safe-by-default command-line client for OpenProject API v3 with saved login supp
 > This codebase is entirely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
 
 ## Map
+$$\color{#16A34A}Tool \space \color{#22C55E}Map$$
 - [Install](#install)
 - [Functionality](#functionality)
 - [Authentication](#authentication)
 - [Quick Start](#quick-start)
-- [Development](#development)
 - [Credits](#credits)
 
 ## Install
@@ -28,14 +28,8 @@ python -m pip install .
 openproject --help
 ```
 
-For local development:
-
-```bash
-uv sync
-uv run openproject --help
-```
-
 ## Functionality
+$$\color{#16A34A}Core \space \color{#22C55E}Features$$
 
 ### Login And Session Setup
 - `openproject login`: save a base URL, token, username, and auth mode for later commands.
@@ -64,6 +58,7 @@ uv run openproject --help
 - Deletion with `--yes` still requires an explicit `--confirm-delete delete-<id>` value.
 
 ## Authentication
+$$\color{#16A34A}Access \space \color{#22C55E}Control$$
 
 Resolution priority:
 
@@ -74,6 +69,7 @@ Resolution priority:
 Write methods (`POST`, `PUT`, `PATCH`, `DELETE`) never run unless `--allow-write` is provided.
 
 ## Quick Start
+$$\color{#16A34A}Quick \space \color{#22C55E}Start$$
 
 ```bash
 uv run openproject login \
@@ -90,16 +86,8 @@ uv run openproject work-packages create 1 \
   --allow-write
 ```
 
-## Development
-
-```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy
-uv run pytest
-```
-
 ## Credits
+$$\color{#16A34A}Project \space \color{#22C55E}Credits$$
 
 This client is built for OpenProject API v3 and is not affiliated with OpenProject.
 
