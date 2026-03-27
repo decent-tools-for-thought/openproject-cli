@@ -10,7 +10,7 @@ from openproject_cli.auth import build_auth_header, load_token, resolve_auth_set
 
 
 def make_args(**overrides: str | None) -> argparse.Namespace:
-    defaults = {
+    defaults: dict[str, str | None] = {
         "base_url": None,
         "auth_mode": None,
         "username": None,
