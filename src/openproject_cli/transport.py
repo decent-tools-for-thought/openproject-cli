@@ -123,10 +123,10 @@ def build_multipart_form_data(
     parts = [
         b"--" + boundary_bytes + b"\r\n"
         b'Content-Disposition: form-data; name="metadata"\r\n'
-        b"Content-Type: application/json\r\n\r\n"
-        + metadata_json
-        + b"\r\n",
-        b"--" + boundary_bytes + b"\r\n"
+        b"Content-Type: application/json\r\n\r\n" + metadata_json + b"\r\n",
+        b"--"
+        + boundary_bytes
+        + b"\r\n"
         + f'Content-Disposition: form-data; name="file"; filename="{escaped_filename}"\r\n'.encode(
             "utf-8"
         )

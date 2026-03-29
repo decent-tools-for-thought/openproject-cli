@@ -54,9 +54,7 @@ def upload_attachment(
 
     file_content = path.read_bytes()
     file_type = (
-        args.content_type
-        or mimetypes.guess_type(path.name)[0]
-        or "application/octet-stream"
+        args.content_type or mimetypes.guess_type(path.name)[0] or "application/octet-stream"
     )
     content_type, body = build_multipart_form_data(
         metadata=metadata,
