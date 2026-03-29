@@ -5,7 +5,13 @@ from unittest.mock import patch
 
 import pytest
 
-from openproject_cli.transport import build_url, confirm_write, maybe_parse_json, parse_body
+from openproject_cli.transport import (
+    build_multipart_form_data,
+    build_url,
+    confirm_write,
+    maybe_parse_json,
+    parse_body,
+)
 
 
 def test_build_url_prefixes_api_v3_and_encodes_query() -> None:
@@ -58,3 +64,19 @@ def test_maybe_parse_json_preserves_plain_text() -> None:
 def test_parse_body_rejects_invalid_json() -> None:
     with pytest.raises(SystemExit, match="Invalid JSON passed to --body"):
         parse_body("{not json}")
+
+
+def test_build_multipart_form_data_encodes_metadata_and_file() -> None:
+    content_type, body = build_multipart_form_data(
+        metadata={"fileName": "example.pdf", "description": "Source PDF"},
+        filename="example.pdf",
+        file_content=b"%PDF-1.4",
+        file_content_type="application/pdf",
+    )
+
+    assert content_type.startswith("multipart/form-data; boundary=openproject-cli-")
+    assert b'name="metadata"' in body
+    assert b'"fileName": "example.pdf"' in body
+    assert b'name="file"; filename="example.pdf"' in body
+    assert b"Content-Type: application/pdf" in body
+    assert b"%PDF-1.4" in body

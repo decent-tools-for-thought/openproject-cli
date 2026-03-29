@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import urllib.parse
 from unittest.mock import patch
 
 import pytest
@@ -10,14 +11,14 @@ from openproject_cli.parser import main
 def test_bare_invocation_prints_help_and_exits_zero(capsys: pytest.CaptureFixture[str]) -> None:
     assert main([]) == 0
     captured = capsys.readouterr()
-    assert "OpenProject API v3 CLI" in captured.out
+    assert "OpenProject API v3 CLI with comprehensive resource commands" in captured.out
 
 
 def test_subtree_help_exits_zero(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["projects"]) == 0
+    assert main(["users"]) == 0
     captured = capsys.readouterr()
-    assert "usage: openproject-cli projects" in captured.out
-    assert "{list,get}" in captured.out
+    assert "usage: openproject-cli users" in captured.out
+    assert "{list,get,current,create,update,delete}" in captured.out
 
 
 def test_usage_errors_return_argparse_exit_code() -> None:
@@ -44,3 +45,37 @@ def test_destructive_request_stays_gated_before_network_access() -> None:
             )
 
     request_mock.assert_not_called()
+
+
+def test_standard_resource_list_builds_collection_query() -> None:
+    with patch("openproject_cli.commands.request", return_value=(200, {}, "{}")) as request_mock:
+        assert (
+            main(
+                [
+                    "users",
+                    "list",
+                    "--base-url",
+                    "https://example.test",
+                    "--token",
+                    "opapi-token",
+                    "--page-size",
+                    "7",
+                    "--offset",
+                    "2",
+                    "--filters",
+                    '[{"status":{"operator":"=","values":["active"]}}]',
+                    "--sort-by",
+                    '[["id","desc"]]',
+                ]
+            )
+            == 0
+        )
+
+    url = request_mock.call_args.args[1]
+    parsed = urllib.parse.urlparse(url)
+    query = urllib.parse.parse_qs(parsed.query)
+    assert parsed.path == "/api/v3/users"
+    assert query["pageSize"] == ["7"]
+    assert query["offset"] == ["2"]
+    assert "status" in urllib.parse.unquote(query["filters"][0])
+    assert "id" in urllib.parse.unquote(query["sortBy"][0])

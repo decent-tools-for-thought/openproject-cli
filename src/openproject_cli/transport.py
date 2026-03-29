@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import secrets
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -64,17 +65,31 @@ def request(
     timeout: int,
 ) -> tuple[int, dict[str, str], str]:
     data = None
+    content_type = None
+    if body_obj is not None:
+        data = json.dumps(body_obj).encode("utf-8")
+        content_type = "application/json"
+    return request_bytes(method, url, auth_header, data, timeout, content_type=content_type)
+
+
+def request_bytes(
+    method: str,
+    url: str,
+    auth_header: str,
+    body: bytes | None,
+    timeout: int,
+    *,
+    content_type: str | None = None,
+) -> tuple[int, dict[str, str], str]:
     headers = {
         "Authorization": auth_header,
         "Accept": "application/hal+json, application/json",
         "User-Agent": "openproject-cli/0.1",
     }
+    if content_type is not None:
+        headers["Content-Type"] = content_type
 
-    if body_obj is not None:
-        data = json.dumps(body_obj).encode("utf-8")
-        headers["Content-Type"] = "application/json"
-
-    req = urllib.request.Request(url=url, method=method, data=data, headers=headers)
+    req = urllib.request.Request(url=url, method=method, data=body, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             raw = resp.read().decode("utf-8", errors="replace")
@@ -91,3 +106,33 @@ def parse_body(body: str | None) -> Any:
         return json.loads(body)
     except json.JSONDecodeError as exc:
         raise SystemExit(f"Invalid JSON passed to --body: {exc}") from exc
+
+
+def build_multipart_form_data(
+    *,
+    metadata: dict[str, Any],
+    filename: str,
+    file_content: bytes,
+    file_content_type: str,
+) -> tuple[str, bytes]:
+    boundary = f"openproject-cli-{secrets.token_hex(12)}"
+    escaped_filename = filename.replace("\\", "\\\\").replace('"', '\\"')
+    metadata_json = json.dumps(metadata, ensure_ascii=True).encode("utf-8")
+    boundary_bytes = boundary.encode("ascii")
+
+    parts = [
+        b"--" + boundary_bytes + b"\r\n"
+        b'Content-Disposition: form-data; name="metadata"\r\n'
+        b"Content-Type: application/json\r\n\r\n"
+        + metadata_json
+        + b"\r\n",
+        b"--" + boundary_bytes + b"\r\n"
+        + f'Content-Disposition: form-data; name="file"; filename="{escaped_filename}"\r\n'.encode(
+            "utf-8"
+        )
+        + f"Content-Type: {file_content_type}\r\n\r\n".encode("ascii")
+        + file_content
+        + b"\r\n",
+        b"--" + boundary_bytes + b"--\r\n",
+    ]
+    return f"multipart/form-data; boundary={boundary}", b"".join(parts)
